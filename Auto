@@ -1,0 +1,75 @@
+-- Create the interface
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextBox = Instance.new("TextBox")
+local Button = Instance.new("TextButton")
+local Title = Instance.new("TextLabel")
+
+-- Configure the interface
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 200, 0, 120)
+Frame.Position = UDim2.new(0.5, -100, 0.5, -60)
+Frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+Title.Parent = Frame
+Title.Size = UDim2.new(0, 180, 0, 20)
+Title.Position = UDim2.new(0, 10, 0, 10)
+Title.Text = "Imperial Spam"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+
+TextBox.Parent = Frame
+TextBox.Size = UDim2.new(0, 180, 0, 30)
+TextBox.Position = UDim2.new(0, 10, 0, 40)
+TextBox.PlaceholderText = "Type your message here"
+TextBox.Text = ""
+
+Button.Parent = Frame
+Button.Size = UDim2.new(0, 180, 0, 30)
+Button.Position = UDim2.new(0, 10, 0, 80)
+Button.Text = "Active"
+Button.Active = false
+Button.AutoButtonColor = false
+Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+
+-- Variable to control the spam state
+local spamActive = false
+
+-- Function to send the message repeatedly
+local function sendMessage()
+    while spamActive do
+        game.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(TextBox.Text, "All")
+        wait(1) -- 1 second interval between messages
+    end
+end
+
+-- Function to update button state
+local function updateButtonState()
+    if TextBox.Text ~= "" then
+        Button.Active = true
+        Button.AutoButtonColor = true
+        Button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+    else
+        Button.Active = false
+        Button.AutoButtonColor = false
+        Button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    end
+end
+
+-- Connect the function to the button click
+Button.MouseButton1Click:Connect(function()
+    if Button.Active then
+        spamActive = not spamActive
+        if spamActive then
+            sendMessage()
+        end
+    end
+end)
+
+-- Connect the function to the TextBox text change
+TextBox:GetPropertyChangedSignal("Text"):Connect(updateButtonState)
+
+-- Initial call to set the button state correctly
+updateButtonState()
